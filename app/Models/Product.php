@@ -16,4 +16,11 @@ class Product extends Model
     {
         return $this->hasMany(Review::class);
     }
+    public function order()
+    {
+        return $this->belongsToMany(Order::class, 'order_products')
+            ->withPivot('amount');
+    }
+
+
 }

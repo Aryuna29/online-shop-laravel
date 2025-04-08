@@ -6,11 +6,17 @@ use App\Http\Requests\OrderRequest;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\UserProduct;
-use Illuminate\Http\Request;
+use App\Services\OrderService;
 use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
+    private OrderService $orderService;
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+
     public function getOrder()
     {
         $userProducts = UserProduct::query()->where('user_id', Auth::id())->with('product')->get();
@@ -23,29 +29,25 @@ class OrderController extends Controller
 
     public function createOrder(OrderRequest $request)
     {
-        $order = Order::query()->create([
-            'user_id' => Auth::id(),
-            'name' => $request->name,
-            'phone' => $request->phone,
-            'comment' => $request->comment,
-            'address' => $request->address,
-        ]);
-        $order_id = $order->id;
-        $userProducts = UserProduct::where('user_id', Auth::id())->get();
-        foreach ($userProducts as $userProduct) {
-            $product_id = $userProduct->product_id;
-            $amount = $userProduct->amount;
-            OrderProduct::query()->create([
-                'order_id' => $order_id,
-                'product_id' => $product_id,
-                'amount' => $amount,
-            ]);
-        }
-        UserProduct::query()->where('user_id', Auth::id())->delete();
+        $data = $request->validated();
+        $this->orderService->create($data);
+        return response()->redirectTo('user-order');
     }
 
     public function getUserOrder()
     {
-        $orders = Order::query()->where('user_id', Auth::id());
+        $userOrders = Order::with('products')
+        ->where('user_id', Auth::id())
+        ->get();
+        foreach ($userOrders as $userOrder) {
+            $sum = 0;
+            foreach ($userOrder->products as $product) {
+                $product->total = $product->pivot->amount * $product->price;
+                $sum += $product->total;
+            }
+            $userOrder->sumTotal = $sum;
+        }
+
+        return view('userOrders', compact('userOrders'));
     }
 }

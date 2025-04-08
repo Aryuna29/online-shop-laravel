@@ -2,6 +2,7 @@
     <a href="/profile" class="button16">Мой профиль</a>
     <a href="/catalog" class="button16">Каталог</a>
     <a href="/cart" class="button16">Корзина</a>
+    <a href="/user-order" class="button16">Мои заказы</a>
     <a href="/logout" class="button16">Выход</a>
     <h3>Отзывы</h3>
     <div class="container container-cards">

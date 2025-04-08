@@ -1,4 +1,3 @@
-form action="orderUsers">
 <section class="cards">
     <a href="/profile" class="button16">Мой профиль</a>
     <a href="/cart" class="button16">Корзина</a>
@@ -8,42 +7,43 @@ form action="orderUsers">
 
     <div class="container container-cards">
         @if ($userOrders->isEmpty())
-        <p>Нет заказов</p>
+            <p>Нет заказов</p>
         @else
             @foreach ($userOrders as $userOrder)
-        <div class="card">
-            <label>Номер заказа: {{$userOrder->id}}</label>
-            <br>
-            <label>Имя: {{$userOrder->name}}</label>
-            <br>
-            <label>Телефон: {{$userOrder->phone}}</label>
-            <br>
-            <label>Адрес: {{$userOrder->address}}</label>
-            <br>
-            <label>Комментарий: {{$userOrder->comment}}</label>
-            <br>
-            <hr>
-                @foreach ($userOrder->product as $orderProduct)
-            <br>
-            <div class="order"><li>{{$orderProduct->product->name}}
+                <div class="card">
+                    <label>Номер заказа: {{$userOrder->id}}</label>
                     <br>
-                    <img src="{{$orderProduct->product->image}}" height="130" width="100" alt="Card image"/>
+                    <label>Имя: {{$userOrder->name}}</label>
                     <br>
-                    <label>
-                        Количество: {{$orderProduct->amount}} шт
+                    <label>Телефон: {{$userOrder->phone}}</label>
+                    <br>
+                    <label>Адрес: {{$userOrder->address}}</label>
+                    <br>
+                    <label>Комментарий: {{$userOrder->comment}}</label>
+                    <br>
+                    <hr>
+                    @foreach ($userOrder->products as $product)
                         <br>
-                        Сумма: <?php echo $orderProduct->getSum();?>₽
-                        <br>
-                    </label></li></div>
-            @endforeach
-            <h4>Сумма заказа: <?php echo $userOrder->getTotal();?>₽</h4>
-        </div>
+                        <div class="order">
+                            <li>{{$product->name}}
+                                <br>
+                                <img src="{{$product->image}}" height="130" width="100" alt="Card image"/>
+                                <br>
+                                <label>
+                                    Количество: {{$product->pivot->amount}} шт
+                                    <br>
+                                    Сумма:{{$product->total}}₽
+                                    <br>
+                                </label></li>
+                        </div>
+                    @endforeach
+                    <h4>Сумма заказа:{{$userOrder->sumTotal}}₽</h4>
+                </div>
 
             @endforeach
         @endif
     </div>
 </section>
-</form>
 <style>
     h3 {
         display: block;
@@ -63,7 +63,7 @@ form action="orderUsers">
         padding: 0 15px;
     }
 
-    .container-cards{
+    .container-cards {
         display: grid;
         width: 100%;
         grid-template-columns:repeat(auto-fill, 225px);
@@ -73,12 +73,13 @@ form action="orderUsers">
         column-gap: 60px;
         row-gap: 70px;
     }
+
     .card {
-        margin:auto;
+        margin: auto;
         width: 275px;
         height: 600px;
         overflow: auto;
-        box-shadow: 1px 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
         border-radius: 6px;
@@ -88,7 +89,7 @@ form action="orderUsers">
 
 
     .card:hover {
-        box-shadow: 4px 8px 16px rgba(255,102,51,0.2);
+        box-shadow: 4px 8px 16px rgba(255, 102, 51, 0.2);
     }
 
 
@@ -99,18 +100,17 @@ form action="orderUsers">
         outline: none;
         border-radius: 1px;
     }
+
     a.button16:hover {
-        background-image:
-            radial-gradient(1px 45% at 0% 50%, rgba(0,0,0,.6), transparent),
-            radial-gradient(1px 45% at 100% 50%, rgba(0,0,0,.6), transparent);
+        background-image: radial-gradient(1px 45% at 0% 50%, rgba(0, 0, 0, .6), transparent),
+        radial-gradient(1px 45% at 100% 50%, rgba(0, 0, 0, .6), transparent);
     }
+
     a.button16:active {
-        background-image:
-            radial-gradient(45% 45% at 50% 100%, rgba(255,255,255,.9), rgba(255,255,255,0)),
-            linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.3));
-        box-shadow:
-            inset rgba(162,95,42,.4) 0 0 0 1px,
-            inset rgba(255,255,255,.9) 0 0 1px 3px;
+        background-image: radial-gradient(45% 45% at 50% 100%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0)),
+        linear-gradient(rgba(255, 255, 255, .4), rgba(255, 255, 255, .3));
+        box-shadow: inset rgba(162, 95, 42, .4) 0 0 0 1px,
+        inset rgba(255, 255, 255, .9) 0 0 1px 3px;
     }
 
 

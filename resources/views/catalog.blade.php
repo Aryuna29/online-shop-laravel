@@ -1,5 +1,6 @@
 <section class="cards">
     <a href="/profile" class="button16">Мой профиль</a>
+    <a href="/user-order" class="button16">Мои заказы</a>
     <a href="/logout" class="button16">Выход</a>
 
     <h3>Каталог</h3>
@@ -9,7 +10,7 @@
 </span></a>
     <div class="container container-cards">
         @foreach($products as $product)
-        <div class="card">
+            <div class="card" id="product-{{ $product->id }}">
             <div class="card-top">
                 <a href="#" class="card-img">
                     <img src="{{$product->image}}"  alt="Card image"/>
@@ -28,7 +29,8 @@
                         <input  name="amount" type="hidden" id="amount" value="1" required>
                         <button class="bt_minus"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
                     </form>
-                    <input type="text" value="{{$product->amount}}" size="1" class="quantity" readonly/>
+                    <input type="text" value="{{$product->amount}}" size="1" class="quantity amount" readonly/>
+
                     <form class="plus" onsubmit="return false" method="POST">
                         @csrf
                         <input type="hidden" name="product_id" value="{{$product->id}}" id="product_id" required>
@@ -51,15 +53,16 @@
 <script>
     $("document").ready(function () {
         // console.log($(this).serialize());
-        $('.plus').submit(function () {
+        $('.plus').submit(function (event) {
+            event.preventDefault()
             $.ajax({
                 type: "POST",
                 url: "{{route('add.product')}}",
                 data: $(this).serialize(),
                 dataType: 'json',
                 success: function (response) {
-                    // Обновляем количество товаров в бейдже корзины
                     $('.cart-count').text(response.count);
+                    $('#product-' + response.product_id + ' .amount').val(response.amount); // .val для <input>
                 },
                 error: function(xhr, status, error) {
                     console.error('Ошибка при добавлении товара:', error);
@@ -70,15 +73,20 @@
 </script>
 <script>
     $("document").ready(function () {
-        $('.minus').submit(function () {
+        $('.minus').submit(function (event) {
+            event.preventDefault()
             $.ajax({
                 type: "POST",
                 url: "{{route('decrease.product')}}",
                 data: $(this).serialize(),
                 dataType: 'json',
                 success: function (response) {
-                    // Обновляем количество товаров в бейдже корзины
                     $('.cart-count').text(response.count);
+                    $('#product-' + response.product_id + ' .amount').val(response.amount);
+
+                    if (response.amount == 0) {
+                        $('#product-' + response.product_id + ' .amount').val(0);
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error('Ошибка при добавлении товара:', error);

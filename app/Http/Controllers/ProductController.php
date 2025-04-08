@@ -9,14 +9,21 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\UserProduct;
 use Illuminate\Support\Facades\Auth;
+use App\Services\CartService;
 
 class ProductController
 {
+    private cartService $cartService;
+    public function __construct(CartService $cartService)
+    {
+        $this->cartService = $cartService;
+    }
+
     public function getCatalog()
     {
         $user_id = Auth::id();
-        $cart = UserProduct::query()->where('user_id', $user_id)->count(); //достаю число товаров из корзины
         $products = Product::all();
+        $cart = UserProduct::query()->where('user_id', $user_id)->count(); //достаю число товаров из корзины
         foreach ($products as $product) {
            $userProduct = UserProduct::query()->where('user_id', $user_id)->where('product_id', $product->id)->first();
            if ($userProduct) {
@@ -31,32 +38,22 @@ class ProductController
 
     public function addProduct(AddRequest $request)
     {
-        $product = Product::query()->findOrFail($request->product_id);
-        $user_id = Auth::id();
-        $userProduct = UserProduct::query()->where('product_id', $product->id)->where('user_id', $user_id)->first();
-        if ($userProduct) {
-          $userProduct->increment('amount');
-        } else {
-             UserProduct::query()->create([
-                'product_id' => $product->id,
-                'user_id' => $user_id,
-                'amount' => 1,
-            ]);
-        }
-        return redirect()->route('catalog');
+        $data = $request->validated();
+        $amount = $this->cartService->addProduct($data['product_id']);
+        return response()->json([
+            'product_id' => $data['product_id'],
+            'amount' => $amount, // новое количество для товара
+        ]);
     }
 
     public function decreaseProduct(DecreaseRequest $request)
     {
-        $product = Product::query()->findOrFail($request->product_id);
-        $user_id = Auth::id();
-        $userProducts = UserProduct::query()->where('product_id', $product->id)->where('user_id', $user_id)->first();
-        if ($userProducts) {
-            $userProducts->delete();
-            return redirect()->route('catalog');
-    } else {
-            return back()->with('error', 'Товар не найден.');
-        }
+        $data = $request->validated();
+        $amount = $this->cartService->decreaseProduct($data['product_id']);
+        return response()->json([
+            'product_id' => $data['product_id'],
+            'amount' => $amount,
+        ]);
     }
 
     public function getProduct(int $id)

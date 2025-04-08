@@ -19,7 +19,7 @@ class UserController
     }
     public function signUp(SignUpRequest $request)
     {
-        $data = $request->all();
+        $data = $request->validated();
        $user = User::query()->create([
            'name' => $data['name'],
            'email' => $data['email'],

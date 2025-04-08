@@ -20,6 +20,7 @@ class Order extends Model
     }
     public function products()
     {
-        return $this->hasManyThrough(Product::class, OrderProduct::class, 'user_id', 'id', 'id', 'product_id');
+        return $this->belongsToMany(Product::class, 'order_products')
+            ->withPivot('amount');
     }
 }

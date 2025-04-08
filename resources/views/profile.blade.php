@@ -3,6 +3,7 @@
     <div class="card-link">
         <a href="/catalog" class="button16">Каталог</a>
         <a href="/cart" class="button16">Корзина</a>
+        <a href="/user-order" class="button16">Мои заказы</a>
         <a href="/logout" class="button16">Выход</a>
     </div>
     <div class="card-info">

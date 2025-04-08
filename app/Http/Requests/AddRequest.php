@@ -22,7 +22,8 @@ class AddRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'product_id' => 'integer|exists:products,id',
+            'amount' => 'integer',
         ];
     }
 }
