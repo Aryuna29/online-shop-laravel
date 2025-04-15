@@ -32,6 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/create-order', [\App\Http\Controllers\OrderController::class, 'createOrder'])->name('post.createOrder');
 
     Route::get('/user-order', [\App\Http\Controllers\OrderController::class, 'getUserOrder'])->name('userOrder');
+
+    Route::get('email/test', [\App\Http\Controllers\TestMailController::class, 'send']);
 });
 
 

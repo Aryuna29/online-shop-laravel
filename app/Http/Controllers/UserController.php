@@ -5,14 +5,21 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\ProfileRequest;
 use App\Http\Requests\SignUpRequest;
-use App\Models\Product;
+use App\Jobs\SendUserNotification;
+use App\Mail\TestMail;
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Services\RabbitmqService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class UserController
 {
+    private RabbitmqService $rabbitmqService;
+    public function __construct(RabbitmqService $rabbitmqService)
+    {
+        $this->rabbitmqService = $rabbitmqService;
+    }
     public function getSignUpForm()
     {
         return view('signUpForm');
@@ -25,6 +32,13 @@ class UserController
            'email' => $data['email'],
            'password' => Hash::make($data['psw']),
        ]);
+        $details = [
+            'title' => 'Привет!',
+            'body' => 'Спасибо за регистрацию!'
+        ];
+
+        SendUserNotification::dispatch($user->email, $details);
+
        return response()->redirectTo('/login');
     }
 
@@ -42,12 +56,13 @@ class UserController
 
     public function editProfile(ProfileRequest $request)
     {
+        $data = $request->validated();
         $user = Auth::user();
-        $user->name = $request->name;
-        $user->email = $request->email;
+        $user->name = $data['name'];
+        $user->email = $data['email'];
 
         if ($request->filled('password')) {
-            $user->password = bcrypt($request->password);
+            $user->password = bcrypt($data['password']);
         }
         $user->save();
         return response()->redirectTo('/profile');
