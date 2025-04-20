@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -10,16 +11,16 @@ class UserNotificationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $details;
-
-    public function __construct($details)
+    private User $user;
+    public function __construct(User $user)
     {
-        $this->details = $details;
+        $this->user = $user;
     }
 
     public function build()
     {
-        return $this->subject('Уведомление')
-            ->view('emails.notification');
+        return $this->subject('Добро пожаловать')
+            ->view('emails.notification')
+            ->with(['name' => $this->user->name]);
     }
 }

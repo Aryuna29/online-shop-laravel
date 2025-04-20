@@ -32,12 +32,8 @@ class UserController
            'email' => $data['email'],
            'password' => Hash::make($data['psw']),
        ]);
-        $details = [
-            'title' => 'Привет!',
-            'body' => 'Спасибо за регистрацию!'
-        ];
 
-        SendUserNotification::dispatch($user->email, $details);
+        SendUserNotification::dispatch($user);
 
        return response()->redirectTo('/login');
     }

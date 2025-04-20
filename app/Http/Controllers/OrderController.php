@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderRequest;
 use App\Models\Order;
-use App\Models\OrderProduct;
+use App\Models\Product;
 use App\Models\UserProduct;
 use App\Services\OrderService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class OrderController extends Controller
 {
@@ -36,9 +38,12 @@ class OrderController extends Controller
 
     public function getUserOrder()
     {
-        $userOrders = Order::with('products')
-        ->where('user_id', Auth::id())
-        ->get();
+        $userId = Auth::id();
+        $userOrders = Cache::remember("user:{$userId}", 30, function () {
+            return Order::with('products')
+                ->where('user_id', Auth::id())
+                ->get();
+        });
         foreach ($userOrders as $userOrder) {
             $sum = 0;
             foreach ($userOrder->products as $product) {
@@ -49,5 +54,33 @@ class OrderController extends Controller
         }
 
         return view('userOrders', compact('userOrders'));
+    }
+
+    public function store(Request $request)
+    {
+        $userId = Auth::id();
+        $order = Order::create($request->all());
+        Cache::forget("user:{$userId}");
+        return redirect()->route('userOrders')
+            ->with('success', 'Заказ создан и кэш сброшен');
+    }
+    public function update(Request $request, Product $product)
+    {
+        $userId = Auth::id();
+        $product->update($request->all());
+        Cache::forget("user:{$userId}");
+
+        return redirect()->route('userOrders')
+            ->with('success', 'Заказ обновлён и кэш сброшен');
+    }
+
+    public function destroy(Product $product)
+    {
+        $userId = Auth::id();
+        $product->delete();
+        Cache::forget("user:{$userId}");
+
+        return redirect()->route('userOrders')
+            ->with('success', 'Заказ удалён и кэш сброшен');
     }
 }

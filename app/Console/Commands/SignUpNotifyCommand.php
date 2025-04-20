@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Services\RabbitmqService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
+
 
 class SignUpNotifyCommand extends Command
 {
