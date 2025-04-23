@@ -21,7 +21,7 @@
                         <p>Спасибо за регистрацию в нашем интернет-магазине. Мы рады видеть вас в числе наших пользователей.</p>
 
                         <p style="text-align: center; margin: 30px 0;">
-                            <a href="https://example.com" style="background-color: #2d89ef; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+                            <a href="/login" style="background-color: #2d89ef; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
                                 Перейти на сайт
                             </a>
                         </p>

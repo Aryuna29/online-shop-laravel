@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AddRequest;
 use App\Http\Requests\DecreaseRequest;
+use App\Http\Requests\ProductImportRequest;
 use App\Http\Requests\ReviewRequest;
+use App\Imports\ProductsImport;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\UserProduct;
@@ -12,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\CartService;
 use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController
 {
@@ -21,6 +24,17 @@ class ProductController
         $this->cartService = $cartService;
     }
 
+    public function import(ProductImportRequest $request)
+    {
+        $data = $request->validated();
+        Excel::import(new ProductsImport, $data['file']);
+        return redirect()->route('catalog');
+    }
+
+    public function showImportForm()
+    {
+        return view('productImport');
+    }
     public function getCatalog()
     {
         $user_id = Auth::id();

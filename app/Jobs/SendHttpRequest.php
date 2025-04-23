@@ -29,12 +29,11 @@ class SendHttpRequest implements ShouldQueue
 
     public function handle(): void
     {
-//        Http::withHeaders($this->headers)->post($this->url, $this->getBody());
         $taskDto = new YougileTaskDto("Заказ #{$this->orderId}",
             'c3e14ec6-1c4c-4485-ab16-6a505210abd7', "{$this->getBody()}");
 
         $taskId = $this->yougileClient->createTask($taskDto);
-
+         Order::query()->where('id', $this->orderId)->update(['yougileTaskId' => $taskId]);
     }
 
     protected function getBody(): string

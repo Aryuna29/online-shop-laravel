@@ -34,6 +34,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/user-order', [\App\Http\Controllers\OrderController::class, 'getUserOrder'])->name('userOrder');
 
     Route::get('email/test', [\App\Http\Controllers\TestMailController::class, 'send']);
+    Route::get('/products/import', [\App\Http\Controllers\ProductController::class, 'showImportForm'])->name('products.import.form');
+    Route::post('/products/import', [\App\Http\Controllers\ProductController::class, 'import'])->name('products.import');
 });
 
 

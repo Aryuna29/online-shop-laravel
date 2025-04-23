@@ -2,6 +2,7 @@
 
 namespace App\Services\Clients;
 
+use App\Models\Order;
 use App\Services\Clients\DTO\YougileTaskDto;
 use Illuminate\Support\Facades\Http;
 
@@ -11,8 +12,8 @@ class YougileClient
     private string $apiKey;
     public function __construct()
     {
-        $this->baseUrl = 'https://api.yougile.com/api-v2/';
-        $this->apiKey = '1HAF3xPsKMBP954xm9WTsJKeCA1GoVtXbExErbG7OlPcPl+cLdtXKUf29mRiLFAu';
+        $this->baseUrl = config('services.yougile.base_url');
+        $this->apiKey = config('services.yougile.api_key');
     }
     public function createTask(YougileTaskDto $taskDto): string
     {
@@ -27,8 +28,9 @@ class YougileClient
        return $data['id'];
     }
 
-    public function deleteTask(int $taskId)
+    public function deleteTask(Order $order)
     {
+        $taskId = Order::where('id', $order->id)->value('yougileTaskId');
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->apiKey,
         ])->delete($this->baseUrl . "tasks/{$taskId}");
